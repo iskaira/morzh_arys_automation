@@ -133,6 +133,7 @@ other/
 db.*
 logs/
 /app/example.*
+example.*
 storage.json
 /app/config.py
 .idea
