@@ -127,3 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Other
+other/
+db.*
+logs/
+example.pyg
+storage.json
+/app/config.py
