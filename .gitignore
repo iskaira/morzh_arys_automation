@@ -132,6 +132,7 @@ dmypy.json
 other/
 db.*
 logs/
-example.pyg
+/app/example.*
 storage.json
 /app/config.py
+.idea
