@@ -7,6 +7,7 @@ from loguru import logger
 
 from app.models.message import Message
 from app.models.stat_user_action import UserAction
+from app.models.user import Status
 
 
 class DBMessageMiddleware(BaseMiddleware):
@@ -19,13 +20,15 @@ class DBMessageMiddleware(BaseMiddleware):
             try:
                 from app.models.user import User
                 user = await User.filter(id=message.chat.id).first()
-                # from app.handlers.base import chat_member_handler
-                # await chat_member_handler(cm_updated=message, user=user)
+                if message.new_chat_member.status == "kicked":
+                    user.status = Status.BLOCKED.value
+                    await user.save(update_fields=["status"])
             except Exception as e:
                 logger.error(f"User: {message} \n\nError: {e}")
 
     async def on_process_callback_query(self, callback_query: CallbackQuery, _: dict):
         try:
+            await callback_query.answer()
             if callback_query.message.chat.type == "private":
                 from app.misc import storage
                 state = FSMContext(storage, callback_query.from_user.id,
@@ -38,7 +41,6 @@ class DBMessageMiddleware(BaseMiddleware):
                     full_update_json=callback_query.as_json()
                 )
         except Exception as e:
-            from app.keyboards.utils.try_message import try_message
             logger.error(f"{callback_query} \n {e}")
 
     async def on_process_message(self, message: types.Message, _: dict):
